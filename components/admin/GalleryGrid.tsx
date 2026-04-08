@@ -4,6 +4,8 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import toast from "react-hot-toast"
 
+const R2_BASE = "https://pub-723d911c6a3442c78b2f69b731577d2b.r2.dev"
+
 export function GalleryGrid({ images }: { images: any[] }) {
   const router = useRouter()
   const [list, setList] = useState(images)
@@ -65,7 +67,7 @@ export function GalleryGrid({ images }: { images: any[] }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
       {list.map((image, index) => (
-        <div 
+        <div
           key={image.id}
           draggable
           onDragStart={(e) => handleDragStart(e, index)}
@@ -73,19 +75,24 @@ export function GalleryGrid({ images }: { images: any[] }) {
           onDrop={(e) => handleDrop(e, index)}
           className="bg-[#FFFFFF] border border-neutral-200 flex flex-col group cursor-grab active:cursor-grabbing hover:border-[#10B981] transition-colors"
         >
-          <div className="h-48 bg-[#FAFAFA] flex items-center justify-center p-2 relative overflow-hidden">
-            <p className="text-[10px] text-[#52525B] break-all p-2 font-['DM_Mono'] text-center">{image.key}</p>
+          <div className="h-48 bg-[#FAFAFA] flex items-center justify-center relative overflow-hidden group-hover:brightness-95 transition-all">
+            <img
+              src={image.key.startsWith('http') || image.key.startsWith('/') ? image.key : `${R2_BASE}/${image.key}`}
+              alt="Gallery asset"
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
           </div>
-          
+
           <div className="p-4 flex flex-col gap-2">
-            <input 
-              type="text" 
+            <input
+              type="text"
               defaultValue={image.caption || ""}
               placeholder="Asset Caption..."
               onBlur={(e) => updateCaption(image.id, e.target.value)}
               className="bg-[#FAFAFA] border-none focus:ring-1 focus:ring-[#10B981] outline-none text-[#09090B] font-['DM_Mono'] text-xs p-2"
             />
-            <button 
+            <button
               onClick={() => handleDelete(image.id)}
               className="text-red-500 hover:text-red-400 font-['DM_Mono'] text-[10px] uppercase tracking-widest text-left mt-2"
             >
@@ -95,9 +102,9 @@ export function GalleryGrid({ images }: { images: any[] }) {
         </div>
       ))}
       {list.length === 0 && (
-         <div className="col-span-full p-8 border border-neutral-200 text-center text-[#52525B] font-['DM_Mono'] text-sm">
-           No assets found in target bucket
-         </div>
+        <div className="col-span-full p-8 border border-neutral-200 text-center text-[#52525B] font-['DM_Mono'] text-sm">
+          No assets found in target bucket
+        </div>
       )}
     </div>
   )
