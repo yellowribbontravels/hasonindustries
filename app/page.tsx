@@ -5,6 +5,7 @@ import { FacilityHighlights } from "@/components/home/FacilityHighlights"
 import { CTA } from "@/components/home/CTA"
 import { GalleryShowcase } from "@/components/home/GalleryShowcase"
 import { TeamGrid } from "@/components/home/TeamGrid"
+import { LaserEntry } from "@/components/home/LaserEntry"
 import { getSetting } from "@/lib/settings"
 import { prisma } from "@/lib/db"
 
@@ -29,13 +30,15 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col">
-      <Hero slides={heroImages} />
-      <StatCounter />
-      <ProductCategoryGrid />
-      <GalleryShowcase keys={galleryKeys} />
-      <FacilityHighlights />
-      <TeamGrid members={team} />
-      <CTA />
+      <LaserEntry>
+        <Hero slides={heroImages} />
+        <StatCounter />
+        <ProductCategoryGrid />
+        <GalleryShowcase keys={galleryKeys} />
+        <FacilityHighlights />
+        <TeamGrid members={team} />
+        <CTA />
+      </LaserEntry>
     </div>
   )
 }

@@ -8,19 +8,20 @@ import { JsonLd } from "@/components/seo/JsonLd"
 import { getSetting } from "@/lib/settings"
 import "./globals.css"
 
-const lora = Lora({ 
-  subsets: ["latin"], 
-  variable: "--font-lora" 
+export const preferredRegion = ['sin1']
+const lora = Lora({
+  subsets: ["latin"],
+  variable: "--font-lora"
 })
-const bebas = Bebas_Neue({ 
-  weight: "400", 
-  subsets: ["latin"], 
-  variable: "--font-bebas" 
+const bebas = Bebas_Neue({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-bebas"
 })
-const dmMono = DM_Mono({ 
-  weight: ["400", "500"], 
-  subsets: ["latin"], 
-  variable: "--font-dm-mono" 
+const dmMono = DM_Mono({
+  weight: ["400", "500"],
+  subsets: ["latin"],
+  variable: "--font-dm-mono"
 })
 
 export const metadata: Metadata = {
@@ -33,11 +34,11 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const contactInfo = await getSetting("contact_info", { 
-    phone1: "+91-9533220698", 
-    phone2: "+91-9533693241", 
-    email: "info@hasonindustries.com", 
-    address: "Hason Industrial Estate\nPhase 2, Sector 4\nGlobal Tech Hub" 
+  const contactInfo = await getSetting("contact_info", {
+    phone1: "+91-9533220698",
+    phone2: "+91-9533693241",
+    email: "info@hasonindustries.com",
+    address: "Hason Industrial Estate\nPhase 2, Sector 4\nGlobal Tech Hub"
   })
 
   return (
@@ -54,9 +55,19 @@ export default async function RootLayout({
             "contactType": "industrial engineering support"
           }
         }} />
-        <div className="fixed inset-0 z-[-2] bg-[#FAFAFA] bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(16,185,129,0.12),rgba(250,250,250,1))]" />
+
+        {/* Multi-layered premium background */}
+        <div className="fixed inset-0 z-[-2] bg-[#FAFAFA]">
+          {/* Base Top Glow */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_1000px_at_50%_-200px,rgba(16,185,129,0.15),transparent)]" />
+          {/* Engineering Blueprint Grid */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#10B98115_1px,transparent_1px),linear-gradient(to_bottom,#10B98115_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:linear-gradient(to_bottom,white_10%,transparent_70%)]" />
+          {/* Micro Precision Dots */}
+          <div className="absolute inset-0 bg-[radial-gradient(#10B98125_1px,transparent_1px)] bg-[size:1rem_1rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,white_10%,transparent_100%)]" />
+        </div>
+
         <div className="noise-overlay" />
-        <Toaster 
+        <Toaster
           position="bottom-right"
           toastOptions={{
             style: {
