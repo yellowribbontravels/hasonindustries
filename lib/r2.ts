@@ -17,4 +17,8 @@ export const r2 = new S3Client({
     accessKeyId: accessKeyId || "",
     secretAccessKey: secretAccessKey || "",
   },
+  // Disable CRC32 checksums — Cloudflare R2 doesn't support them
+  // and they cause 403 Forbidden errors on presigned PUT uploads
+  requestChecksumCalculation: "WHEN_REQUIRED",
+  responseChecksumValidation: "WHEN_REQUIRED",
 })
