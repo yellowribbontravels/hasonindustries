@@ -36,10 +36,10 @@ export default async function ProductsPage({
 
   return (
     <div className="flex flex-col min-h-screen">
-      <div className="pt-40 pb-20 px-6 bg-[#FAFAFA] border-b border-neutral-300 border-opacity-50 relative overflow-hidden">
+      <div className="pt-24 md:pt-32 lg:pt-40 pb-16 md:pb-20 px-4 sm:px-6 bg-[#FAFAFA] border-b border-neutral-300 border-opacity-50 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#FFFFFF] via-transparent to-transparent pointer-events-none" />
         <div className="max-w-7xl mx-auto relative z-10">
-          <h1 className="text-6xl md:text-8xl font-['Bebas_Neue'] tracking-widest text-[#09090B] mb-4">
+          <h1 className="text-5xl sm:text-6xl md:text-8xl font-['Bebas_Neue'] tracking-widest text-[#09090B] mb-3 md:mb-4">
             COMPONENT <span className="text-[#10B981]">MATRIX</span>
           </h1>
           <p className="font-['Lora'] text-[#52525B] max-w-xl text-sm md:text-base leading-relaxed">
@@ -48,21 +48,21 @@ export default async function ProductsPage({
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-16 w-full flex flex-col md:flex-row gap-16 flex-1">
-        
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 md:py-16 w-full flex flex-col md:flex-row gap-8 md:gap-16 flex-1">
+
         {/* Sidebar Filter */}
         <aside className="w-full md:w-64 shrink-0">
-          <h3 className="font-['Bebas_Neue'] tracking-widest text-2xl text-[#09090B] mb-6 border-b border-neutral-200 pb-4">
+          <h3 className="font-['Bebas_Neue'] tracking-widest text-xl md:text-2xl text-[#09090B] mb-4 md:mb-6 border-b border-neutral-200 pb-3 md:pb-4">
             Filter Parameters
           </h3>
-          <nav className="flex flex-col gap-3 font-['DM_Mono'] text-xs uppercase tracking-widest">
+          <nav className="flex flex-row md:flex-col gap-2 md:gap-3 font-['DM_Mono'] text-[10px] md:text-xs uppercase tracking-widest overflow-x-auto pb-4 md:pb-0 scrollbar-hide whitespace-nowrap md:whitespace-normal">
             {categories.map(c => {
               const isActive = (categoryFilter || "") === c.id
               return (
-                <Link 
-                  key={c.id || "all"} 
+                <Link
+                  key={c.id || "all"}
                   href={c.id ? `/products?category=${c.id}` : "/products"}
-                  className={`transition-colors py-3 border-l-2 pl-4 ${isActive ? 'text-[#10B981] border-[#10B981] bg-[#FFFFFF]' : 'text-[#52525B] border-transparent hover:border-neutral-300 hover:text-[#09090B]'}`}
+                  className={`transition-colors py-2 md:py-3 px-4 md:px-0 md:border-l-2 md:border-b-0 border-b-2 md:pl-4 inline-block md:block ${isActive ? 'text-[#10B981] border-[#10B981] bg-[#FFFFFF] shadow-sm md:shadow-none' : 'text-[#52525B] border-transparent hover:border-neutral-300 md:hover:text-[#09090B]'}`}
                 >
                   {c.label}
                 </Link>
@@ -79,22 +79,22 @@ export default async function ProductsPage({
             </div>
           ) : (
             products.map((product) => (
-              <Link 
-                href={`/products/${product.slug}`} 
+              <Link
+                href={`/products/${product.slug}`}
                 key={product.id}
                 className="group border border-neutral-200 bg-[#FFFFFF] flex flex-col hover:border-[#10B981] transition-colors relative"
               >
                 <div className="aspect-square bg-[#FAFAFA] relative overflow-hidden flex items-center justify-center p-4">
                   {product.imageKeys && product.imageKeys.length > 0 ? (
                     <div className="w-full h-full text-center text-[#52525B] font-['DM_Mono'] text-[8px] flex items-center justify-center p-2 break-all opacity-30 group-hover:opacity-100 transition-opacity">
-                       Linked R2 Asset: <br/>{product.imageKeys[0]}
+                      Linked R2 Asset: <br />{product.imageKeys[0]}
                     </div>
                   ) : (
                     <div className="text-[#52525B] font-['DM_Mono'] text-[10px] uppercase border border-neutral-200 p-2">No Visual Asset</div>
                   )}
                   <div className="absolute inset-0 bg-[#10B981] opacity-0 group-hover:opacity-[0.05] transition-opacity duration-500 pointer-events-none" />
                 </div>
-                
+
                 <div className="p-6 flex flex-col border-t border-neutral-200 group-hover:border-[#10B981] transition-colors">
                   <p className="font-['DM_Mono'] text-[10px] text-[#10B981] uppercase tracking-widest mb-3">{product.parentCat?.name || "Uncategorized"}</p>
                   <h2 className="font-['Bebas_Neue'] text-3xl tracking-widest text-[#09090B] mb-2">{product.name}</h2>

@@ -1,59 +1,71 @@
-"use client"
-
-import { useEffect, useRef } from "react"
-import { gsap } from "gsap"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { prisma } from "@/lib/db"
 import Link from "next/link"
+import { ArrowRight } from "lucide-react"
 
-const categories = [
-  { id: "glass-epoxy", title: "Glass Epoxy", desc: "High mechanical strength and superior dielectric properties under extreme thermal stress." },
-  { id: "insulation", title: "Insulation Materials", desc: "Thermal and electrical barriers engineered for heavy industrial machinery." },
-  { id: "engineering-plastics", title: "Engineering Plastics", desc: "Custom-formulated polymers designed for high-wear and structural applications." },
-  { id: "cnc-components", title: "CNC Components", desc: "Micro-precision machined parts tailored exactly to CAD telemetry." }
-]
+export async function ProductCategoryGrid() {
+  const categories = await prisma.productCategory.findMany({
+    orderBy: { order: "asc" }
+  })
 
-export function ProductCategoryGrid() {
-  const container = useRef(null)
-
-  useEffect(() => {
-    let ctx = gsap.context(() => {
-      gsap.from(".cat-card", {
-        scrollTrigger: {
-          trigger: container.current,
-          start: "top 70%"
-        },
-        y: 50,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.15,
-        ease: "power2.out"
-      })
-    }, container)
-    return () => ctx.revert()
-  }, [])
+  // Fallback descriptions for category types
+  const descriptions: Record<string, string> = {
+    default: "Engineered solutions built to exact specifications for heavy industrial applications."
+  }
 
   return (
-    <section ref={container} className="py-32 relative bg-[#FAFAFA]">
-      <div className="max-w-7xl mx-auto px-6">
-        <h2 className="text-5xl md:text-7xl font-['Bebas_Neue'] tracking-wider text-[#09090B] mb-16 text-center md:text-left">
-          MATRIX <span className="text-[#10B981]">CATEGORIES</span>
-        </h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-          {categories.map((cat) => (
-            <Link key={cat.id} href={`/products?category=${cat.id}`} className="cat-card group block bg-[#FFFFFF] border border-neutral-200 p-8 md:p-12 hover:border-[#10B981] transition-colors relative overflow-hidden">
-              <div className="absolute inset-0 bg-[#10B981] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-in-out opacity-[0.03]" />
-              
-              <h3 className="text-3xl font-['Bebas_Neue'] tracking-widest text-[#09090B] mb-4 group-hover:text-[#10B981] transition-colors">{cat.title}</h3>
-              <p className="font-['Lora'] text-[#52525B] text-sm leading-relaxed mb-8 max-w-sm">
-                {cat.desc}
-              </p>
-              
-              <div className="flex items-center text-[#10B981] font-['DM_Mono'] text-xs uppercase tracking-widest mt-auto">
-                Explore Matrix <span className="ml-2 transform group-hover:translate-x-2 transition-transform">→</span>
-              </div>
-            </Link>
-          ))}
+    <section className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+
+        <div className="mb-10 md:mb-16">
+          <p className="font-['DM_Mono'] text-[#10B981] text-[10px] uppercase tracking-widest mb-3">Our Range</p>
+          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-['Bebas_Neue'] tracking-wider text-[#09090B]">
+            Product <span className="text-[#10B981]">Categories</span>
+          </h2>
+        </div>
+
+        {categories.length === 0 ? (
+          <div className="py-16 text-center font-['DM_Mono'] text-[#52525B] text-xs uppercase tracking-widest">
+            Categories coming soon
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 lg:gap-8">
+            {categories.map((cat, index) => (
+              <Link
+                key={cat.id}
+                href={`/products?category=${cat.slug}`}
+                className="group block bg-[#FFFFFF] border border-neutral-200 p-6 md:p-8 lg:p-10 hover:border-[#10B981] transition-all duration-300 relative overflow-hidden"
+              >
+                {/* Hover fill */}
+                <div className="absolute inset-0 bg-[#10B981] origin-bottom scale-y-0 group-hover:scale-y-100 transition-transform duration-500 ease-in-out opacity-[0.04]" />
+
+                <span className="font-['DM_Mono'] text-[9px] text-[#10B981] uppercase tracking-widest mb-4 block">
+                  {String(index + 1).padStart(2, "0")} //
+                </span>
+                <h3 className="text-2xl sm:text-3xl font-['Bebas_Neue'] tracking-widest text-[#09090B] mb-3 group-hover:text-[#10B981] transition-colors">
+                  {cat.name}
+                </h3>
+                <p className="font-['Lora'] text-[#52525B] text-sm leading-relaxed mb-6 max-w-xs">
+                  {descriptions[cat.slug] || descriptions.default}
+                </p>
+
+                <div className="flex items-center gap-2 text-[#10B981] font-['DM_Mono'] text-[10px] uppercase tracking-widest">
+                  Explore Range
+                  <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-2 transition-transform" />
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {/* View all products link */}
+        <div className="mt-8 md:mt-12 text-center sm:text-right">
+          <Link
+            href="/products"
+            className="inline-flex items-center gap-2 font-['DM_Mono'] text-xs uppercase tracking-widest text-[#52525B] hover:text-[#10B981] transition-colors border-b border-neutral-300 hover:border-[#10B981] pb-1"
+          >
+            View All Products
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
       </div>
     </section>

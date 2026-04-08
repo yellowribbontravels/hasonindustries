@@ -45,81 +45,81 @@ export default async function ProductDetailPage({ params }: { params: Params }) 
   return (
     <div className="flex flex-col min-h-screen">
       <JsonLd data={productJsonLd} />
-      
-      <div className="pt-32 pb-16 px-6 max-w-7xl mx-auto w-full">
-         <Link href="/products" className="text-[#52525B] font-['DM_Mono'] text-xs uppercase tracking-widest hover:text-[#10B981] transition-colors mb-8 inline-block select-none">
-           ← Return to Matrix
-         </Link>
 
-         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mt-8">
-            {/* Visuals */}
-            <div className="flex flex-col gap-6">
-              <div className="aspect-square bg-[#FFFFFF] border border-neutral-200 flex items-center justify-center p-8 relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-tr from-[#10B981]/10 to-transparent pointer-events-none" />
-                {product.imageKeys && product.imageKeys.length > 0 ? (
-                  <p className="font-['DM_Mono'] text-xs text-[#52525B] break-all text-center">{product.imageKeys[0]}</p>
-                ) : (
-                  <p className="font-['DM_Mono'] text-xs text-[#52525B] uppercase border border-neutral-200 p-4">Asset Missing</p>
-                )}
-                <div className="absolute bottom-4 right-4 text-[#52525B] font-['DM_Mono'] text-[10px] uppercase font-bold tracking-widest border border-neutral-200 px-3 py-1 bg-[#FAFAFA]">Fig. 1</div>
+      <div className="pt-24 md:pt-32 pb-16 md:pb-24 px-4 sm:px-6 max-w-7xl mx-auto w-full">
+        <Link href="/products" className="text-[#52525B] font-['DM_Mono'] text-[10px] md:text-xs uppercase tracking-widest hover:text-[#10B981] transition-colors mb-6 md:mb-8 inline-block select-none">
+          ← Return to Matrix
+        </Link>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 mt-4 md:mt-8">
+          {/* Visuals */}
+          <div className="flex flex-col gap-4 md:gap-6">
+            <div className="aspect-square bg-[#FFFFFF] border border-neutral-200 flex items-center justify-center p-6 md:p-8 relative overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-tr from-[#10B981]/10 to-transparent pointer-events-none" />
+              {product.imageKeys && product.imageKeys.length > 0 ? (
+                <p className="font-['DM_Mono'] text-[10px] md:text-xs text-[#52525B] break-all text-center">{product.imageKeys[0]}</p>
+              ) : (
+                <p className="font-['DM_Mono'] text-[10px] md:text-xs text-[#52525B] uppercase border border-neutral-200 p-4">Asset Missing</p>
+              )}
+              <div className="absolute bottom-4 right-4 text-[#52525B] font-['DM_Mono'] text-[9px] md:text-[10px] uppercase font-bold tracking-widest border border-neutral-200 px-3 py-1 bg-[#FAFAFA]">Fig. 1</div>
+            </div>
+
+            {product.imageKeys && product.imageKeys.length > 1 && (
+              <div className="flex overflow-x-auto gap-3 md:grid md:grid-cols-4 md:gap-4 pb-2 scrollbar-hide md:pb-0">
+                {product.imageKeys.slice(1).map((key, i) => (
+                  <div key={i} className="shrink-0 w-24 md:w-auto aspect-square bg-[#FFFFFF] border border-neutral-200 flex flex-col items-center justify-center overflow-hidden p-2 hover:border-[#10B981] transition-colors cursor-pointer relative">
+                    <p className="font-['DM_Mono'] text-[8px] text-[#52525B] break-all truncate text-center w-full px-1">{key}</p>
+                    <span className="absolute bottom-1 right-1 text-[8px] font-['DM_Mono'] tracking-widest text-[#10B981]">0{i + 2}</span>
+                  </div>
+                ))}
               </div>
-              
-              {product.imageKeys && product.imageKeys.length > 1 && (
-                <div className="grid grid-cols-4 gap-4">
-                  {product.imageKeys.slice(1).map((key, i) => (
-                    <div key={i} className="aspect-square bg-[#FFFFFF] border border-neutral-200 flex flex-col items-center justify-center overflow-hidden p-2 hover:border-[#10B981] transition-colors cursor-pointer relative">
-                      <p className="font-['DM_Mono'] text-[8px] text-[#52525B] break-all truncate text-center w-full">{key}</p>
-                      <span className="absolute bottom-1 right-1 text-[8px] font-['DM_Mono'] tracking-widest text-[#10B981]">0{i+2}</span>
+            )}
+          </div>
+
+          {/* Core Info */}
+          <div className="flex flex-col">
+            <div className="border-b border-neutral-200 pb-8 md:pb-10 mb-8 md:mb-10">
+              <div className="flex justify-between items-start mb-4 md:mb-6">
+                <p className="font-['DM_Mono'] text-[10px] md:text-xs text-[#FAFAFA] bg-[#10B981] px-2 md:px-3 py-1 font-bold uppercase tracking-widest inline-block">
+                  {product.parentCat ? product.parentCat.name : "UNCATEGORIZED"}
+                </p>
+                <p className="font-['DM_Mono'] text-[9px] md:text-[10px] text-[#52525B] uppercase tracking-widest border border-neutral-200 px-2 md:px-3 py-1 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-[#10B981] rounded-full inline-block animate-pulse" /> Active Standard
+                </p>
+              </div>
+              <h1 className="font-['Bebas_Neue'] text-4xl sm:text-5xl md:text-7xl lg:text-[80px] tracking-widest text-[#09090B] mb-4 md:mb-6 leading-[0.9]">
+                {product.name}
+              </h1>
+              <p className="font-['Lora'] text-[#52525B] text-sm md:text-base leading-relaxed">
+                {product.description}
+              </p>
+            </div>
+
+            {/* Specs */}
+            {Object.keys(specs).length > 0 && (
+              <div className="flex flex-col gap-4 md:gap-6 mb-10 md:mb-12">
+                <h3 className="font-['Bebas_Neue'] text-3xl md:text-4xl tracking-widest text-[#09090B]">Technical Specifications</h3>
+                <div className="bg-[#FFFFFF] border border-neutral-200 flex flex-col pt-1">
+                  {Object.entries(specs).map(([k, v], i) => (
+                    <div key={k} className={`flex justify-between px-4 md:px-6 py-3 md:py-4 ${i !== Object.entries(specs).length - 1 ? 'border-b border-neutral-200' : ''}`}>
+                      <span className="font-['DM_Mono'] text-[10px] md:text-xs text-[#52525B] uppercase tracking-widest w-1/3">{k}</span>
+                      <span className="font-['DM_Mono'] text-[10px] md:text-[11px] text-[#09090B] text-right font-bold tracking-wide break-words w-2/3">{v}</span>
                     </div>
                   ))}
                 </div>
-              )}
+              </div>
+            )}
+
+            <div className="mt-auto flex flex-col sm:grid sm:grid-cols-2 gap-3 md:gap-4">
+              <Link href="/contact" className="w-full bg-[#10B981] text-[#FAFAFA] font-['DM_Mono'] text-xs md:text-sm tracking-widest font-bold uppercase py-4 md:py-5 text-center transition-colors hover:bg-[#09090B]">
+                Inquire Volume Order
+              </Link>
+              <Link href="/contact" className="w-full border border-neutral-300 text-[#09090B] font-['DM_Mono'] text-xs md:text-sm tracking-widest font-bold uppercase py-4 md:py-5 text-center transition-colors hover:border-[#10B981] hover:text-[#10B981]">
+                Custom Fabrication
+              </Link>
             </div>
-
-            {/* Core Info */}
-            <div className="flex flex-col">
-               <div className="border-b border-neutral-200 pb-10 mb-10">
-                 <div className="flex justify-between items-start mb-6">
-                   <p className="font-['DM_Mono'] text-xs text-[#FAFAFA] bg-[#10B981] px-3 py-1 font-bold uppercase tracking-widest inline-block">
-                     {product.parentCat ? product.parentCat.name : "UNCATEGORIZED"}
-                   </p>
-                   <p className="font-['DM_Mono'] text-[10px] text-[#52525B] uppercase tracking-widest border border-neutral-200 px-3 py-1 flex items-center gap-2">
-                     <span className="w-1.5 h-1.5 bg-[#10B981] rounded-full inline-block animate-pulse" /> Active Standard
-                   </p>
-                 </div>
-                 <h1 className="font-['Bebas_Neue'] text-5xl md:text-7xl lg:text-[80px] tracking-widest text-[#09090B] mb-6 leading-[0.9]">
-                   {product.name}
-                 </h1>
-                 <p className="font-['Lora'] text-[#52525B] text-base leading-relaxed">
-                   {product.description}
-                 </p>
-               </div>
-
-               {/* Specs */}
-               {Object.keys(specs).length > 0 && (
-                 <div className="flex flex-col gap-6 mb-12">
-                   <h3 className="font-['Bebas_Neue'] text-4xl tracking-widest text-[#09090B]">Technical Specifications</h3>
-                   <div className="bg-[#FFFFFF] border border-neutral-200 flex flex-col pt-1">
-                     {Object.entries(specs).map(([k, v], i) => (
-                       <div key={k} className={`flex justify-between px-6 py-4 ${i !== Object.entries(specs).length - 1 ? 'border-b border-neutral-200' : ''}`}>
-                         <span className="font-['DM_Mono'] text-xs text-[#52525B] uppercase tracking-widest">{k}</span>
-                         <span className="font-['DM_Mono'] text-[11px] text-[#09090B] text-right font-bold tracking-wide">{v}</span>
-                       </div>
-                     ))}
-                   </div>
-                 </div>
-               )}
-
-               <div className="mt-auto grid grid-cols-1 sm:grid-cols-2 gap-4">
-                 <Link href="/contact" className="bg-[#10B981] text-[#FAFAFA] font-['DM_Mono'] text-sm tracking-widest font-bold uppercase py-5 text-center transition-colors hover:bg-[#09090B]">
-                   Inquire Volume Order
-                 </Link>
-                 <Link href="/contact" className="border border-neutral-300 text-[#09090B] font-['DM_Mono'] text-sm tracking-widest font-bold uppercase py-5 text-center transition-colors hover:border-[#10B981] hover:text-[#10B981]">
-                   Custom Fabrication
-                 </Link>
-               </div>
-            </div>
-         </div>
+          </div>
+        </div>
       </div>
 
       <CTA />

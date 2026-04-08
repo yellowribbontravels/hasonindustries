@@ -17,16 +17,16 @@ export default async function GalleryPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <div className="pt-40 pb-20 px-6 max-w-7xl mx-auto w-full relative z-10 text-center">
-        <h1 className="text-6xl md:text-[100px] font-['Bebas_Neue'] tracking-widest text-[#09090B] mb-6 leading-none">
-          VISUAL <span className="text-[#10B981]">ASSETS</span>
+      <div className="pt-24 md:pt-40 pb-16 md:pb-20 px-4 sm:px-6 max-w-7xl mx-auto w-full relative z-10 text-center">
+        <h1 className="text-6xl sm:text-7xl md:text-[100px] font-['Bebas_Neue'] tracking-widest text-[#09090B] mb-4 md:mb-6 leading-none">
+          VISUAL <span className="text-[#10B981] block sm:inline">ASSETS</span>
         </h1>
-        <p className="font-['Lora'] text-[#52525B] max-w-2xl mx-auto text-base leading-relaxed">
+        <p className="font-['Lora'] text-[#52525B] max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
           A documented history of engineered solutions, facility snapshots, and precision CNC components crafted for critical operating environments.
         </p>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 pb-32 w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-24 md:pb-32 w-full">
         <GalleryMasonry images={images} />
       </div>
 
