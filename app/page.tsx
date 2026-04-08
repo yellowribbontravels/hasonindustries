@@ -12,7 +12,13 @@ export const dynamic = "force-dynamic"
 
 export default async function Home() {
   const heroImages = await getSetting<string[]>("hero_images", [
-    "/placeholder-hero.jpg"
+    "/hasan_banner_2.jpg",
+    "/hasan_banner_3.jpg",
+    "/hasan_banner_4.jpg",
+    "/hasan_banner_5.jpg",
+    "/hasan_banner_6.jpg",
+    "/hasan_banner_8.jpg",
+    "/hasan_banner_9.jpg"
   ])
 
   const team = await prisma.teamMember.findMany({
