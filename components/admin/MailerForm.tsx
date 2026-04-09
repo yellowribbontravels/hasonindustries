@@ -7,22 +7,73 @@ import toast from "react-hot-toast"
 import dynamic from "next/dynamic"
 import { useSearchParams } from "next/navigation"
 
+import { Loader2, CheckCircle, AlertCircle, X } from "lucide-react"
+
 // Dynamically import ReactQuill to prevent SSR window/document errors
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false })
 import "react-quill-new/dist/quill.snow.css"
 
 const initialState: MailerState = { success: false }
 
-function SubmitButton() {
+function SubmissionOverlay({ state }: { state: MailerState }) {
     const { pending } = useFormStatus()
+    const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
+
+    useEffect(() => {
+        if (pending) {
+            setStatus("loading")
+        } else if (status === "loading") {
+            if (state?.error) {
+                setStatus("error")
+            } else if (state?.success && state.timestamp) {
+                setStatus("success")
+            }
+        }
+    }, [pending, state, status])
+
+    if (status === "idle") return null
+
     return (
-        <button
-            type="submit"
-            disabled={pending}
-            className="mt-6 bg-[#09090B] text-[#FAFAFA] font-['DM_Mono'] text-xs font-bold uppercase tracking-widest px-8 py-4 hover:bg-[#10B981] transition-colors disabled:opacity-50"
-        >
-            {pending ? "Transmitting..." : "Dispatch Email"}
-        </button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#FAFAFA]/80 backdrop-blur-sm transition-all duration-300">
+            <div className="bg-[#FFFFFF] border border-neutral-200 shadow-[0_20px_50px_rgba(16,185,129,0.05)] p-10 max-w-sm w-full flex flex-col items-center text-center relative animate-in fade-in zoom-in-95 duration-200">
+
+                {status !== "loading" && (
+                    <button type="button" onClick={() => setStatus("idle")} className="absolute top-4 right-4 text-neutral-400 hover:text-neutral-800 transition-colors">
+                        <X className="w-5 h-5" />
+                    </button>
+                )}
+
+                {status === "loading" && (
+                    <>
+                        <Loader2 className="w-16 h-16 text-[#10B981] animate-spin mb-6" />
+                        <h3 className="text-2xl font-['Bebas_Neue'] tracking-widest text-[#09090B] mb-2">Transmitting</h3>
+                        <p className="font-['DM_Mono'] text-xs text-[#52525B] uppercase tracking-widest">Dispatching payload...</p>
+                    </>
+                )}
+
+                {status === "success" && (
+                    <>
+                        <CheckCircle className="w-16 h-16 text-[#10B981] mb-6" strokeWidth={1.5} />
+                        <h3 className="text-2xl font-['Bebas_Neue'] tracking-widest text-[#09090B] mb-2 uppercase">Message Dispatched</h3>
+                        <p className="font-['Lora'] text-sm text-[#52525B] mb-8 leading-relaxed">The email has been successfully structured and delivered.</p>
+                        <button type="button" onClick={() => setStatus("idle")} className="w-full bg-[#10B981] text-[#FAFAFA] font-['Bebas_Neue'] tracking-widest text-xl py-3 hover:bg-[#09090B] transition-colors uppercase">
+                            Acknowledge
+                        </button>
+                    </>
+                )}
+
+                {status === "error" && (
+                    <>
+                        <AlertCircle className="w-16 h-16 text-red-500 mb-6" strokeWidth={1.5} />
+                        <h3 className="text-2xl font-['Bebas_Neue'] tracking-widest text-[#09090B] mb-2 uppercase">Delivery Failed</h3>
+                        <p className="font-['Lora'] text-sm text-[#52525B] mb-8 leading-relaxed">{state?.error || "An anomaly occurred during email delivery."}</p>
+                        <button type="button" onClick={() => setStatus("idle")} className="w-full bg-neutral-200 text-[#09090B] font-['Bebas_Neue'] tracking-widest text-xl py-3 hover:bg-[#09090B] hover:text-[#FAFAFA] transition-colors uppercase">
+                            Retry Connection
+                        </button>
+                    </>
+                )}
+            </div>
+        </div>
     )
 }
 
@@ -34,10 +85,7 @@ export function MailerForm() {
     const replySubject = searchParams.get('subject') || ''
 
     useEffect(() => {
-        if (state?.error) {
-            toast.error(state.error)
-        } else if (state?.success && state.timestamp) {
-            toast.success("Message dispatched successfully.")
+        if (state?.success && state.timestamp) {
             const form = document.getElementById("mailerForm") as HTMLFormElement
             if (form) form.reset()
             setContent("")
@@ -83,7 +131,14 @@ export function MailerForm() {
                 </div>
             </div>
 
-            <SubmitButton />
+            <button
+                type="submit"
+                className="mt-6 bg-[#09090B] text-[#FAFAFA] font-['DM_Mono'] text-xs font-bold uppercase tracking-widest px-8 py-4 hover:bg-[#10B981] transition-colors disabled:opacity-50"
+            >
+                Dispatch Email
+            </button>
+
+            <SubmissionOverlay state={state} />
         </form>
     )
 }
