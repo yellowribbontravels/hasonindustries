@@ -48,7 +48,7 @@ export default async function MaterialCategoryPage({ params }: { params: Params 
 
     return (
         <div className="flex flex-col min-h-screen bg-[#FAFAFA]">
-            <div className="pt-24 md:pt-32 px-4 sm:px-6 max-w-7xl mx-auto w-full pb-16 md:pb-24">
+            <div className="pt-8 md:pt-10 px-4 sm:px-6 max-w-7xl mx-auto w-full pb-16 md:pb-24">
 
                 <Link href="/materials" className="text-[#52525B] font-['DM_Mono'] text-[10px] md:text-xs uppercase tracking-widest hover:text-[#10B981] transition-colors mb-6 md:mb-8 inline-block select-none">
                     ← Return to All Materials
@@ -69,15 +69,23 @@ export default async function MaterialCategoryPage({ params }: { params: Params 
                         <section>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                                 {materials.map(m => (
-                                    <Link href={`/materials/${categoryId}/${m.slug}`} key={m.id} className="group flex flex-col h-full bg-[#FFFFFF] border border-neutral-200 p-5 md:p-6 hover:border-[#10B981] transition-color transition-colors relative overflow-hidden">
-                                        <div className="absolute inset-0 bg-[#FAFAFA] -z-10 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-in-out"></div>
-                                        <h3 className="text-lg md:text-xl font-bold font-['DM_Mono'] text-[#09090B] uppercase tracking-wide mb-2 group-hover:text-[#10B981] transition-colors">{m.name}</h3>
-                                        <p className="text-xs text-[#52525B] line-clamp-3 mb-6 relative z-10">{m.description || "Specifications available for industrial deployment."}</p>
+                                    <Link href={`/materials/${categoryId}/${m.slug}`} key={m.id} className="group flex flex-col h-full bg-[#FFFFFF] border border-neutral-200 hover:border-[#10B981] transition-colors relative overflow-hidden">
+                                        {m.imageKeys && m.imageKeys.length > 0 && (
+                                            <div className="w-full aspect-[4/3] bg-[#FAFAFA] border-b border-neutral-200 overflow-x-auto flex snap-x snap-mandatory scrollbar-hide relative">
+                                                {m.imageKeys.map((key, idx) => (
+                                                    <img key={key} src={`https://pub-723d911c6a3442c78b2f69b731577d2b.r2.dev/${key}`} alt={`${m.name} ${idx + 1}`} className="w-full h-full object-cover shrink-0 snap-center group-hover:scale-105 transition-transform duration-500" />
+                                                ))}
+                                            </div>
+                                        )}
+                                        <div className="p-5 md:p-6 flex flex-col flex-1 relative z-10 w-full">
+                                            <h3 className="text-lg md:text-xl font-bold font-['DM_Mono'] text-[#09090B] uppercase tracking-wide mb-2 group-hover:text-[#10B981] transition-colors">{m.name}</h3>
+                                            <div className="text-xs text-[#52525B] line-clamp-3 mb-6 relative z-10 w-full [&>p]:mb-1 [&>h1]:text-sm [&>h2]:text-sm [&>ul]:list-disc [&>ul]:ml-4" dangerouslySetInnerHTML={{ __html: m.description || "Specifications available for industrial deployment." }} />
 
-                                        <div className="mt-auto flex items-center justify-between z-10">
-                                            <span className="text-[9px] md:text-[10px] uppercase font-['DM_Mono'] tracking-widest text-[#10B981] opacity-0 group-hover:opacity-100 transition-opacity">View Spec</span>
-                                            <div className="w-7 h-7 md:w-8 md:h-8 rounded-full border border-neutral-200 flex items-center justify-center group-hover:border-[#10B981] group-hover:bg-[#10B981] shrink-0">
-                                                <span className="w-1.5 h-1.5 bg-[#52525B] rounded-full group-hover:bg-[#FAFAFA]"></span>
+                                            <div className="mt-auto flex items-center justify-between z-10">
+                                                <span className="text-[9px] md:text-[10px] uppercase font-['DM_Mono'] tracking-widest text-[#10B981] opacity-0 group-hover:opacity-100 transition-opacity">View Spec</span>
+                                                <div className="w-7 h-7 md:w-8 md:h-8 rounded-full border border-neutral-200 flex items-center justify-center group-hover:border-[#10B981] group-hover:bg-[#10B981] shrink-0 transition-colors">
+                                                    <span className="w-1.5 h-1.5 bg-[#52525B] rounded-full group-hover:bg-[#FAFAFA]"></span>
+                                                </div>
                                             </div>
                                         </div>
                                     </Link>

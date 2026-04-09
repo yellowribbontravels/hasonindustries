@@ -29,7 +29,7 @@ export default async function ProductsPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <div className="pt-24 md:pt-32 lg:pt-40 pb-16 md:pb-20 px-4 sm:px-6 bg-[#FAFAFA] border-b border-neutral-300 border-opacity-50 relative overflow-hidden">
+      <div className="pt-10 md:pt-16 pb-16 md:pb-20 px-4 sm:px-6 bg-[#FAFAFA] border-b border-neutral-300 border-opacity-50 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#FFFFFF] via-transparent to-transparent pointer-events-none" />
         <div className="max-w-7xl mx-auto relative z-10">
           <h1 className="text-5xl sm:text-6xl md:text-8xl font-['Bebas_Neue'] tracking-widest text-[#09090B] mb-3 md:mb-4">

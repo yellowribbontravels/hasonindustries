@@ -25,6 +25,14 @@ body {
   overflow-x: hidden;
 }
 
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
 .noise-overlay {
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;

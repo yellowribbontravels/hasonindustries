@@ -58,14 +58,14 @@ export default async function ProductDetailPage({ params }: { params: Params }) 
     <div className="flex flex-col min-h-screen">
       <JsonLd data={productJsonLd} />
 
-      <div className="pt-24 md:pt-32 pb-16 md:pb-24 px-4 sm:px-6 max-w-7xl mx-auto w-full">
+      <div className="pb-16 md:pb-24 px-4 sm:px-6 max-w-7xl mx-auto w-full pt-10">
         <Link href={`/products/${product.parentCat?.slug || "uncategorized"}`} className="text-[#52525B] font-['DM_Mono'] text-[10px] md:text-xs uppercase tracking-widest hover:text-[#10B981] transition-colors mb-6 md:mb-8 inline-block select-none">
           ← Return to {product.parentCat?.name || "Uncategorized"} Category
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 mt-4 md:mt-8">
           {/* Visuals */}
-          <div className="flex flex-col gap-4 md:gap-6">
+          <div className="flex flex-col gap-4 md:gap-6 min-w-0">
             <div className="aspect-square bg-[#FFFFFF] border border-neutral-200 flex items-center justify-center p-6 md:p-8 relative overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-tr from-[#10B981]/10 to-transparent pointer-events-none" />
               {product.imageKeys && product.imageKeys.length > 0 ? (
@@ -89,7 +89,7 @@ export default async function ProductDetailPage({ params }: { params: Params }) 
           </div>
 
           {/* Core Info */}
-          <div className="flex flex-col">
+          <div className="flex flex-col min-w-0 break-words">
             <div className="border-b border-neutral-200 pb-8 md:pb-10 mb-8 md:mb-10">
               <div className="flex justify-between items-start mb-4 md:mb-6">
                 <p className="font-['DM_Mono'] text-[10px] md:text-xs text-[#FAFAFA] bg-[#10B981] px-2 md:px-3 py-1 font-bold uppercase tracking-widest inline-block">
@@ -102,9 +102,10 @@ export default async function ProductDetailPage({ params }: { params: Params }) 
               <h1 className="font-['Bebas_Neue'] text-4xl sm:text-5xl md:text-7xl lg:text-[80px] tracking-widest text-[#09090B] mb-4 md:mb-6 leading-[0.9]">
                 {product.name}
               </h1>
-              <p className="font-['Lora'] text-[#52525B] text-sm md:text-base leading-relaxed">
-                {product.description}
-              </p>
+              <div
+                className="font-['Lora'] text-[#52525B] text-sm md:text-base leading-relaxed break-words overflow-hidden [&>p]:break-words [&>p]:mb-4 [&>h1]:text-3xl [&>h1]:font-['Bebas_Neue'] [&>h1]:tracking-widest [&>h1]:text-[#09090B] [&>h1]:mb-4 [&>h1]:mt-8 [&>h2]:text-2xl [&>h2]:font-['Bebas_Neue'] [&>h2]:tracking-widest [&>h2]:text-[#09090B] [&>h2]:mb-3 [&>h2]:mt-6 [&>ul]:list-disc [&>ul]:ml-6 [&>ul]:mb-4 [&>ul>li]:mb-1 [&>ol]:list-decimal [&>ol]:ml-6 [&>ol]:mb-4 [&>a]:text-[#10B981] [&>a]:underline [&>img]:w-full [&>img]:h-auto [&>img]:border [&>img]:border-neutral-200 [&>img]:p-2 [&>img]:mb-4"
+                dangerouslySetInnerHTML={{ __html: product.description || "" }}
+              />
             </div>
 
             {/* Specs */}

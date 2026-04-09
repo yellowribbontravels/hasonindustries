@@ -6,6 +6,7 @@ import { TopBar } from "@/components/layout/TopBar"
 import { Footer } from "@/components/layout/Footer"
 import { JsonLd } from "@/components/seo/JsonLd"
 import { getSetting } from "@/lib/settings"
+import NextTopLoader from 'nextjs-toploader'
 import "./globals.css"
 
 export const preferredRegion = ['sin1']
@@ -44,6 +45,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`${lora.variable} ${bebas.variable} ${dmMono.variable}`}>
       <body className="antialiased selection:bg-[#10B981] selection:text-[#FAFAFA]">
+        <NextTopLoader color="#10B981" showSpinner={false} />
         <JsonLd data={{
           "@context": "https://schema.org",
           "@type": "Organization",

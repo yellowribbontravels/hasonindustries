@@ -5,27 +5,84 @@ import { useDropzone } from "react-dropzone"
 import { useRouter } from "next/navigation"
 import { ImagePlus, X, Loader2, Plus, Trash2 } from "lucide-react"
 import toast from "react-hot-toast"
+import dynamic from "next/dynamic"
+
+const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false })
+import "react-quill-new/dist/quill.snow.css"
 
 export default function NewMaterial() {
   const router = useRouter()
-  const [categories, setCategories] = useState<{id: string, name: string}[]>([])
+  const [categories, setCategories] = useState<{ id: string, name: string }[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [files, setFiles] = useState<File[]>([])
-  
+
   const [formData, setFormData] = useState({
     name: "",
     categoryId: "",
     description: "",
   })
 
-  const [specs, setSpecs] = useState<{key: string, value: string}[]>([
+  const [specs, setSpecs] = useState<{ key: string, value: string }[]>([
     { key: "Thickness", value: "0.1mm - 100mm" },
     { key: "Temperature", value: "Class H" }
   ])
 
   useEffect(() => {
-    fetch('/api/admin/material-categories').then(res => res.json()).then(data => setCategories(data)).catch(() => {})
+    fetch('/api/admin/material-categories').then(res => res.json()).then(data => setCategories(data)).catch(() => { })
   }, [])
+
+  const imageHandler = useCallback(function (this: any) {
+    const input = document.createElement("input")
+    input.setAttribute("type", "file")
+    input.setAttribute("accept", "image/*")
+    input.click()
+
+    input.onchange = async () => {
+      const file = input.files ? input.files[0] : null
+      if (!file) return
+
+      const toastId = toast.loading("Uploading inline image...")
+      try {
+        const presignRes = await fetch('/api/admin/upload/presign', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: file.name, contentType: file.type, folder: 'materials' })
+        })
+        const { presignedUrl, key } = await presignRes.json()
+
+        await fetch(presignedUrl, {
+          method: 'PUT',
+          body: file,
+          headers: { 'Content-Type': file.type }
+        })
+
+        const quillObj = this.quill
+        const range = quillObj.getSelection()
+        const url = `https://pub-723d911c6a3442c78b2f69b731577d2b.r2.dev/${key}`
+
+        quillObj.insertEmbed(range?.index || 0, "image", url)
+        toast.success("Image embedded", { id: toastId })
+      } catch (e) {
+        toast.error("Image upload failed", { id: toastId })
+      }
+    }
+  }, [])
+
+  const modules = {
+    toolbar: {
+      container: [
+        [{ 'header': [1, 2, 3, false] }],
+        ['bold', 'italic', 'underline', 'strike'],
+        [{ 'color': [] }, { 'background': [] }],
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+        ['link', 'image', 'video'],
+        ['clean']
+      ],
+      handlers: {
+        image: imageHandler
+      }
+    }
+  }
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setFiles(prev => [...prev, ...acceptedFiles])
@@ -84,8 +141,8 @@ export default function NewMaterial() {
 
       // Convert specs to an object format expected by the DB or standard JSON
       const specsObj = specs.reduce((acc, curr) => {
-         if (curr.key.trim()) acc[curr.key] = curr.value
-         return acc
+        if (curr.key.trim()) acc[curr.key] = curr.value
+        return acc
       }, {} as Record<string, string>)
 
       toast.loading("Saving properties...", { id: toastId })
@@ -100,10 +157,10 @@ export default function NewMaterial() {
       })
 
       if (!res.ok) throw new Error("API Failure")
-      
+
       toast.success("Material saved successfully", { id: toastId })
       router.push('/admin/materials')
-      
+
     } catch (error) {
       toast.error("Failed to save. Please try again.", { id: toastId })
     } finally {
@@ -116,71 +173,79 @@ export default function NewMaterial() {
       <h1 className="text-3xl font-['Bebas_Neue'] tracking-wider text-[#09090B] mb-8 border-b border-neutral-200 pb-4">
         NEW <span className="text-[#10B981]">MATERIAL</span>
       </h1>
-      
+
       <form onSubmit={handleSubmit} className="space-y-8">
-        
+
         <div className="bg-[#FFFFFF] border border-neutral-200 p-6 space-y-6">
           <h2 className="text-sm font-['DM_Mono'] text-[#09090B] tracking-widest uppercase mb-6 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#10B981]"></span> Basic Information
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-xs uppercase font-['DM_Mono'] tracking-widest text-[#52525B] mb-2">Material Name</label>
-              <input type="text" required className="w-full border p-3 focus:border-[#10B981] outline-none" 
-                     value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+              <input type="text" required className="w-full border p-3 focus:border-[#10B981] outline-none"
+                value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
             </div>
             <div>
-               <label className="block text-xs uppercase font-['DM_Mono'] tracking-widest text-[#52525B] mb-2">Category</label>
-               <select required className="w-full border p-3 focus:border-[#10B981] outline-none bg-transparent"
-                       value={formData.categoryId} onChange={e => setFormData({...formData, categoryId: e.target.value})}>
-                 <option value="" disabled>Select Category</option>
-                 {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-               </select>
+              <label className="block text-xs uppercase font-['DM_Mono'] tracking-widest text-[#52525B] mb-2">Category</label>
+              <select required className="w-full border p-3 focus:border-[#10B981] outline-none bg-transparent"
+                value={formData.categoryId} onChange={e => setFormData({ ...formData, categoryId: e.target.value })}>
+                <option value="" disabled>Select Category</option>
+                {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
             </div>
           </div>
 
           <div>
-             <label className="block text-xs uppercase font-['DM_Mono'] tracking-widest text-[#52525B] mb-2">Description</label>
-             <textarea rows={4} className="w-full border p-3 focus:border-[#10B981] outline-none"
-                     value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
+            <label className="block text-xs uppercase font-['DM_Mono'] tracking-widest text-[#52525B] mb-2">Description (Rich HTML)</label>
+            <div className="bg-white border focus-within:border-[#10B981] transition-colors">
+              {/* @ts-ignore */}
+              <ReactQuill
+                theme="snow"
+                value={formData.description}
+                onChange={(val: string) => setFormData({ ...formData, description: val })}
+                modules={modules}
+                className="h-64 mb-12"
+              />
+            </div>
           </div>
         </div>
 
         {/* Dynamic Key-Value Specs */}
         <div className="bg-[#FFFFFF] border border-neutral-200 p-6 space-y-4">
-           <div className="flex justify-between items-center mb-6">
-              <h2 className="text-sm font-['DM_Mono'] text-[#09090B] tracking-widest uppercase flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#10B981]"></span> Specifications List
-              </h2>
-              <button type="button" onClick={addSpec} className="flex items-center gap-1 text-xs font-['DM_Mono'] text-[#10B981] hover:text-[#0B8A4C]">
-                 <Plus className="w-4 h-4" /> Add Spec
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-sm font-['DM_Mono'] text-[#09090B] tracking-widest uppercase flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#10B981]"></span> Specifications List
+            </h2>
+            <button type="button" onClick={addSpec} className="flex items-center gap-1 text-xs font-['DM_Mono'] text-[#10B981] hover:text-[#0B8A4C]">
+              <Plus className="w-4 h-4" /> Add Spec
+            </button>
+          </div>
+
+          {specs.map((spec, index) => (
+            <div key={index} className="flex gap-4 items-start">
+              <div className="flex-1">
+                <input type="text" placeholder="Spec Name (e.g. Thickness)" className="w-full border p-3 focus:border-[#10B981] outline-none"
+                  value={spec.key} onChange={e => updateSpec(index, "key", e.target.value)} />
+              </div>
+              <div className="flex-[2]">
+                <input type="text" placeholder="Value (e.g. 10mm)" className="w-full border p-3 focus:border-[#10B981] outline-none"
+                  value={spec.value} onChange={e => updateSpec(index, "value", e.target.value)} />
+              </div>
+              <button type="button" onClick={() => removeSpec(index)} className="p-3 text-rose-500 hover:bg-rose-50 transition-colors border border-transparent">
+                <Trash2 className="w-5 h-5" />
               </button>
-           </div>
-           
-           {specs.map((spec, index) => (
-             <div key={index} className="flex gap-4 items-start">
-               <div className="flex-1">
-                 <input type="text" placeholder="Spec Name (e.g. Thickness)" className="w-full border p-3 focus:border-[#10B981] outline-none"
-                        value={spec.key} onChange={e => updateSpec(index, "key", e.target.value)} />
-               </div>
-               <div className="flex-[2]">
-                 <input type="text" placeholder="Value (e.g. 10mm)" className="w-full border p-3 focus:border-[#10B981] outline-none"
-                        value={spec.value} onChange={e => updateSpec(index, "value", e.target.value)} />
-               </div>
-               <button type="button" onClick={() => removeSpec(index)} className="p-3 text-rose-500 hover:bg-rose-50 transition-colors border border-transparent">
-                  <Trash2 className="w-5 h-5" />
-               </button>
-             </div>
-           ))}
+            </div>
+          ))}
         </div>
 
         {/* Multi-Dropzone */}
         <div className="bg-[#FFFFFF] border border-neutral-200 p-6">
-           <h2 className="text-sm font-['DM_Mono'] text-[#09090B] tracking-widest uppercase mb-6 flex items-center gap-2">
+          <h2 className="text-sm font-['DM_Mono'] text-[#09090B] tracking-widest uppercase mb-6 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#10B981]"></span> Images
           </h2>
-          
+
           <div {...getRootProps()} className={`border-2 border-dashed p-10 text-center cursor-pointer transition-colors ${isDragActive ? 'border-[#10B981] bg-[#10B981]/5' : 'border-neutral-300 hover:border-[#10B981]'}`}>
             <input {...getInputProps()} />
             <ImagePlus className="w-8 h-8 mx-auto mb-4 text-[#10B981]" />

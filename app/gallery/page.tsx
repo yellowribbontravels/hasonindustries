@@ -17,7 +17,7 @@ export default async function GalleryPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <div className="pt-24 md:pt-40 pb-16 md:pb-20 px-4 sm:px-6 max-w-7xl mx-auto w-full relative z-10 text-center">
+      <div className="pt-10 md:pt-16 pb-16 md:pb-20 px-4 sm:px-6 max-w-7xl mx-auto w-full relative z-10 text-center">
         <h1 className="text-6xl sm:text-7xl md:text-[100px] font-['Bebas_Neue'] tracking-widest text-[#09090B] mb-4 md:mb-6 leading-none">
           VISUAL <span className="text-[#10B981] block sm:inline">ASSETS</span>
         </h1>

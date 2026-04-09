@@ -17,7 +17,7 @@ export default async function ContactPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <div className="pt-24 md:pt-32 lg:pt-40 pb-16 md:pb-24 lg:pb-32 px-4 sm:px-6 max-w-7xl mx-auto w-full relative z-10">
+      <div className="pt-10 md:pt-16 pb-16 md:pb-24 lg:pb-32 px-4 sm:px-6 max-w-7xl mx-auto w-full relative z-10">
         <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-[100px] font-['Bebas_Neue'] tracking-widest text-[#09090B] mb-6 md:mb-8 pb-6 md:pb-8 border-b border-neutral-300 leading-none lg:leading-[0.85]">
           SECURE <span className="text-[#10B981] block sm:inline">CONNECTION</span>
         </h1>

@@ -52,7 +52,7 @@ export default async function MaterialDetail({ params }: { params: Params }) {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#FAFAFA] pt-24 md:pt-32 pb-16 md:pb-24 text-[#09090B]">
+    <div className="flex flex-col min-h-screen bg-[#FAFAFA] pb-16 md:pb-24 text-[#09090B]">
       <JsonLd data={matJsonLd} />
 
       {/* Top Banner mapping screenshot */}
@@ -73,14 +73,11 @@ export default async function MaterialDetail({ params }: { params: Params }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16">
 
         {/* Left Side: Specs matching screenshot */}
-        <div>
-          <h2 className="text-xl md:text-2xl font-bold font-['DM_Mono'] uppercase tracking-widest mb-4 md:mb-6">
-            {material.name} - Advanced Engineering Material
-          </h2>
-
-          <p className="font-['Lora'] text-[#52525B] text-base md:text-lg leading-relaxed mb-10 md:mb-12">
-            {material.description}
-          </p>
+        <div className="min-w-0 break-words">
+          <div
+            className="font-['Lora'] text-[#52525B] text-base md:text-lg leading-relaxed mb-10 md:mb-12 break-words overflow-hidden [&>p]:break-words [&>p]:mb-4 [&>h1]:text-3xl [&>h1]:font-['Bebas_Neue'] [&>h1]:tracking-widest [&>h1]:text-[#09090B] [&>h1]:mb-4 [&>h1]:mt-8 [&>h2]:text-2xl [&>h2]:font-['Bebas_Neue'] [&>h2]:tracking-widest [&>h2]:text-[#09090B] [&>h2]:mb-3 [&>h2]:mt-6 [&>ul]:list-disc [&>ul]:ml-6 [&>ul]:mb-4 [&>ul>li]:mb-1 [&>ol]:list-decimal [&>ol]:ml-6 [&>ol]:mb-4 [&>a]:text-[#10B981] [&>a]:underline [&>img]:w-full [&>img]:h-auto [&>img]:border [&>img]:border-neutral-200 [&>img]:p-2 [&>img]:mb-4"
+            dangerouslySetInnerHTML={{ __html: material.description || "" }}
+          />
 
           {specs && Object.keys(specs).length > 0 && (
             <div className="space-y-6 md:space-y-8 font-['Lora'] text-[#09090B]">
@@ -104,7 +101,7 @@ export default async function MaterialDetail({ params }: { params: Params }) {
         </div>
 
         {/* Right Side: Images */}
-        <div className="space-y-4 md:space-y-6">
+        <div className="space-y-4 md:space-y-6 min-w-0">
           {material.imageKeys && material.imageKeys.length > 0 ? (
             material.imageKeys.map((key) => (
               <div key={key} className="border border-neutral-200 bg-[#FFFFFF] p-3 md:p-4 shadow-sm w-full">

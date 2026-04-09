@@ -5,12 +5,16 @@ import { useDropzone } from "react-dropzone"
 import { useRouter } from "next/navigation"
 import { ImagePlus, X, Loader2, Plus, Trash2 } from "lucide-react"
 import toast from "react-hot-toast"
+import dynamic from "next/dynamic"
+
+const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false })
+import "react-quill-new/dist/quill.snow.css"
 
 export function ProductForm({ initialData = null }: { initialData?: any }) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [categories, setCategories] = useState<{id: string, name: string}[]>([])
-  
+  const [categories, setCategories] = useState<{ id: string, name: string }[]>([])
+
   const [formData, setFormData] = useState({
     name: initialData?.name || "",
     slug: initialData?.slug || "",
@@ -20,8 +24,8 @@ export function ProductForm({ initialData = null }: { initialData?: any }) {
   })
 
   // Start with empty or parsed specs
-  const [specs, setSpecs] = useState<{key: string, value: string}[]>(
-    initialData?.specs 
+  const [specs, setSpecs] = useState<{ key: string, value: string }[]>(
+    initialData?.specs
       ? Object.entries(initialData.specs).map(([key, value]) => ({ key, value: value as string }))
       : [{ key: "Dimensions", value: "" }]
   )
@@ -30,8 +34,61 @@ export function ProductForm({ initialData = null }: { initialData?: any }) {
   const [existingImages, setExistingImages] = useState<string[]>(initialData?.imageKeys || [])
 
   useEffect(() => {
-    fetch('/api/admin/product-categories').then(res => res.json()).then(data => setCategories(data)).catch(() => {})
+    fetch('/api/admin/product-categories').then(res => res.json()).then(data => setCategories(data)).catch(() => { })
   }, [])
+
+  const imageHandler = useCallback(function (this: any) {
+    const input = document.createElement("input")
+    input.setAttribute("type", "file")
+    input.setAttribute("accept", "image/*")
+    input.click()
+
+    input.onchange = async () => {
+      const file = input.files ? input.files[0] : null
+      if (!file) return
+
+      const toastId = toast.loading("Uploading inline image...")
+      try {
+        const presignRes = await fetch('/api/admin/upload/presign', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: file.name, contentType: file.type, folder: 'products' })
+        })
+        const { presignedUrl, key } = await presignRes.json()
+
+        await fetch(presignedUrl, {
+          method: 'PUT',
+          body: file,
+          headers: { 'Content-Type': file.type }
+        })
+
+        const quillObj = this.quill
+        const range = quillObj.getSelection()
+        const url = `https://pub-723d911c6a3442c78b2f69b731577d2b.r2.dev/${key}`
+
+        quillObj.insertEmbed(range?.index || 0, "image", url)
+        toast.success("Image embedded", { id: toastId })
+      } catch (e) {
+        toast.error("Image upload failed", { id: toastId })
+      }
+    }
+  }, [])
+
+  const modules = {
+    toolbar: {
+      container: [
+        [{ 'header': [1, 2, 3, false] }],
+        ['bold', 'italic', 'underline', 'strike'],
+        [{ 'color': [] }, { 'background': [] }],
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+        ['link', 'image', 'video'],
+        ['clean']
+      ],
+      handlers: {
+        image: imageHandler
+      }
+    }
+  }
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setFiles(prev => [...prev, ...acceptedFiles])
@@ -45,7 +102,7 @@ export function ProductForm({ initialData = null }: { initialData?: any }) {
   const removeFile = (index: number) => {
     setFiles(prev => prev.filter((_, i) => i !== index))
   }
-  
+
   const removeExistingImage = (keyToRemove: string) => {
     setExistingImages(prev => prev.filter(key => key !== keyToRemove))
   }
@@ -88,12 +145,12 @@ export function ProductForm({ initialData = null }: { initialData?: any }) {
 
       const finalImageKeys = [...existingImages, ...uploadedKeys]
       const specsObj = specs.reduce((acc, curr) => {
-         if (curr.key.trim()) acc[curr.key] = curr.value
-         return acc
+        if (curr.key.trim()) acc[curr.key] = curr.value
+        return acc
       }, {} as Record<string, string>)
 
       toast.loading("Saving Data...", { id: toastId })
-      
+
       const payload = {
         ...formData,
         categoryId: formData.categoryId || null,
@@ -109,11 +166,11 @@ export function ProductForm({ initialData = null }: { initialData?: any }) {
       })
 
       if (!res.ok) throw new Error("Database Error")
-      
+
       toast.success("Product Saved", { id: toastId })
       router.push('/admin/products')
       router.refresh()
-      
+
     } catch (error) {
       toast.error("Failed to save product", { id: toastId })
     } finally {
@@ -124,45 +181,45 @@ export function ProductForm({ initialData = null }: { initialData?: any }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        
+
         {/* Basic Info */}
         <div className="space-y-6">
           <h2 className="text-sm font-['DM_Mono'] text-[#09090B] tracking-widest uppercase pb-2 border-b border-neutral-200">
             Basic Information
           </h2>
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-xs uppercase font-['DM_Mono'] tracking-widest text-[#52525B] mb-2">Product Name</label>
-              <input type="text" required className="w-full border p-3 focus:border-[#10B981] outline-none bg-white" 
-                     value={formData.name} onChange={e => {
-                       const name = e.target.value
-                       setFormData({
-                         ...formData, 
-                         name, 
-                         slug: !initialData ? name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : formData.slug
-                       })
-                     }} />
-            </div>
-            
-            <div>
-              <label className="block text-xs uppercase font-['DM_Mono'] tracking-widest text-[#52525B] mb-2">URL Link (Slug)</label>
-              <input type="text" required className="w-full border p-3 focus:border-[#10B981] outline-none bg-white" 
-                     value={formData.slug} onChange={e => setFormData({...formData, slug: e.target.value})} />
+              <input type="text" required className="w-full border p-3 focus:border-[#10B981] outline-none bg-white"
+                value={formData.name} onChange={e => {
+                  const name = e.target.value
+                  setFormData({
+                    ...formData,
+                    name,
+                    slug: !initialData ? name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : formData.slug
+                  })
+                }} />
             </div>
 
             <div>
-               <label className="block text-xs uppercase font-['DM_Mono'] tracking-widest text-[#52525B] mb-2">Category (Optional)</label>
-               <select className="w-full border p-3 focus:border-[#10B981] outline-none bg-white"
-                       value={formData.categoryId || ""} onChange={e => setFormData({...formData, categoryId: e.target.value})}>
-                 <option value="">None (Uncategorized)</option>
-                 {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-               </select>
+              <label className="block text-xs uppercase font-['DM_Mono'] tracking-widest text-[#52525B] mb-2">URL Link (Slug)</label>
+              <input type="text" required className="w-full border p-3 focus:border-[#10B981] outline-none bg-white"
+                value={formData.slug} onChange={e => setFormData({ ...formData, slug: e.target.value })} />
+            </div>
+
+            <div>
+              <label className="block text-xs uppercase font-['DM_Mono'] tracking-widest text-[#52525B] mb-2">Category (Optional)</label>
+              <select className="w-full border p-3 focus:border-[#10B981] outline-none bg-white"
+                value={formData.categoryId || ""} onChange={e => setFormData({ ...formData, categoryId: e.target.value })}>
+                <option value="">None (Uncategorized)</option>
+                {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
             </div>
 
             <div className="flex items-center gap-3 pt-4 border-t border-neutral-100">
               <input type="checkbox" id="featured" className="w-4 h-4 accent-[#10B981]"
-                     checked={formData.featured} onChange={e => setFormData({...formData, featured: e.target.checked})} />
+                checked={formData.featured} onChange={e => setFormData({ ...formData, featured: e.target.checked })} />
               <label htmlFor="featured" className="text-xs uppercase font-['DM_Mono'] tracking-widest text-[#10B981] cursor-pointer">
                 Show on Homepage Carousel
               </label>
@@ -175,35 +232,43 @@ export function ProductForm({ initialData = null }: { initialData?: any }) {
           <h2 className="text-sm font-['DM_Mono'] text-[#09090B] tracking-widest uppercase pb-2 border-b border-neutral-200">
             Details & Specifications
           </h2>
-          
+
           <div className="space-y-4">
             <div>
-              <label className="block text-xs uppercase font-['DM_Mono'] tracking-widest text-[#52525B] mb-2">Description</label>
-              <textarea rows={4} required className="w-full border p-3 focus:border-[#10B981] outline-none bg-white"
-                        value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})}></textarea>
+              <label className="block text-xs uppercase font-['DM_Mono'] tracking-widest text-[#52525B] mb-2">Description (Rich HTML)</label>
+              <div className="bg-white border focus-within:border-[#10B981] transition-colors">
+                {/* @ts-ignore */}
+                <ReactQuill
+                  theme="snow"
+                  value={formData.description}
+                  onChange={(val: string) => setFormData({ ...formData, description: val })}
+                  modules={modules}
+                  className="h-64 mb-12"
+                />
+              </div>
             </div>
 
             <div className="border border-neutral-200 bg-neutral-50 p-4">
-               <div className="flex items-center justify-between mb-4">
-                  <label className="block text-xs uppercase font-['DM_Mono'] tracking-widest text-[#52525B]">Add Specifications</label>
-                  <button type="button" onClick={addSpec} className="bg-[#10B981] text-white p-1 rounded-sm hover:bg-[#0B8A4C]">
-                     <Plus className="w-4 h-4" />
-                  </button>
-               </div>
-               
-               <div className="space-y-3">
-                 {specs.map((spec, index) => (
-                   <div key={index} className="flex gap-2 items-start">
-                     <input type="text" placeholder="Key (e.g. Color)" className="flex-1 w-full border p-2 focus:border-[#10B981] outline-none text-sm"
-                            value={spec.key} onChange={e => updateSpec(index, "key", e.target.value)} />
-                     <input type="text" placeholder="Value (e.g. Red)" className="flex-1 w-full border p-2 focus:border-[#10B981] outline-none text-sm"
-                            value={spec.value} onChange={e => updateSpec(index, "value", e.target.value)} />
-                     <button type="button" onClick={() => removeSpec(index)} className="p-2 text-rose-500 hover:bg-rose-50 transition-colors bg-white border border-neutral-200">
-                        <Trash2 className="w-4 h-4" />
-                     </button>
-                   </div>
-                 ))}
-               </div>
+              <div className="flex items-center justify-between mb-4">
+                <label className="block text-xs uppercase font-['DM_Mono'] tracking-widest text-[#52525B]">Add Specifications</label>
+                <button type="button" onClick={addSpec} className="bg-[#10B981] text-white p-1 rounded-sm hover:bg-[#0B8A4C]">
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                {specs.map((spec, index) => (
+                  <div key={index} className="flex gap-2 items-start">
+                    <input type="text" placeholder="Key (e.g. Color)" className="flex-1 w-full border p-2 focus:border-[#10B981] outline-none text-sm"
+                      value={spec.key} onChange={e => updateSpec(index, "key", e.target.value)} />
+                    <input type="text" placeholder="Value (e.g. Red)" className="flex-1 w-full border p-2 focus:border-[#10B981] outline-none text-sm"
+                      value={spec.value} onChange={e => updateSpec(index, "value", e.target.value)} />
+                    <button type="button" onClick={() => removeSpec(index)} className="p-2 text-rose-500 hover:bg-rose-50 transition-colors bg-white border border-neutral-200">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -213,7 +278,7 @@ export function ProductForm({ initialData = null }: { initialData?: any }) {
         <h2 className="text-sm font-['DM_Mono'] text-[#09090B] tracking-widest uppercase pb-2 border-b border-neutral-200">
           Product Images (Upload)
         </h2>
-        
+
         <div {...getRootProps()} className={`border-2 border-dashed p-10 text-center cursor-pointer transition-colors bg-white ${isDragActive ? 'border-[#10B981] bg-[#10B981]/5' : 'border-neutral-300 hover:border-[#10B981]'}`}>
           <input {...getInputProps()} />
           <ImagePlus className="w-8 h-8 mx-auto mb-4 text-[#10B981]" />
