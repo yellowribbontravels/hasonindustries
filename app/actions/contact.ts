@@ -90,7 +90,7 @@ export async function submitContact(
         }),
       );
 
-      Promise.allSettled(dispatchPromises).catch((e) =>
+      await Promise.allSettled(dispatchPromises).catch((e) =>
         console.error("Admin dispatch errors:", e),
       );
     }
@@ -107,7 +107,7 @@ export async function submitContact(
       `,
     );
 
-    sendEmail({
+    await sendEmail({
       to: data.email,
       subject: "Hason Industries - Enquiry Received",
       html: compiledClient.html,
