@@ -33,11 +33,11 @@ export function StatCounter() {
   }, [])
 
   return (
-    <section ref={container} className="py-14 md:py-20 lg:py-28 bg-[#FAFAFA] border-y border-neutral-200">
+    <section ref={container} className="py-14 md:py-20 lg:py-28 bg-gradient-to-br from-[#FAFAFA] via-[#10B981]/5 to-[#10B981]/20 border-y border-neutral-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-neutral-200">
           {stats.map((stat, i) => (
-            <div key={i} className="stat-item flex flex-col items-center justify-center text-center py-10 md:py-12 px-4 bg-[#FAFAFA]">
+            <div key={i} className="stat-item flex flex-col items-center justify-center text-center py-10 md:py-12 px-4 bg-gradient-to-b from-[#FFFFFF] to-[#FAFAFA] hover:to-[#10B981]/5 transition-colors">
               <h3 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-['Bebas_Neue'] text-[#09090B] tracking-widest leading-none mb-3">
                 {stat.num}
               </h3>

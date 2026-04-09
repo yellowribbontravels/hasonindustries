@@ -2,6 +2,7 @@ import { Hero } from "@/components/home/Hero"
 import { StatCounter } from "@/components/home/StatCounter"
 import { ProductCategoryGrid } from "@/components/home/ProductCategoryGrid"
 import { FacilityHighlights } from "@/components/home/FacilityHighlights"
+import { MaterialCategoryGrid } from "@/components/home/MaterialCategoryGrid"
 import { CTA } from "@/components/home/CTA"
 import { GalleryShowcase } from "@/components/home/GalleryShowcase"
 import { TeamGrid } from "@/components/home/TeamGrid"
@@ -34,6 +35,7 @@ export default async function Home() {
         <Hero slides={heroImages} />
         <StatCounter />
         <ProductCategoryGrid />
+        <MaterialCategoryGrid />
         <GalleryShowcase keys={galleryKeys} />
         <FacilityHighlights />
         <TeamGrid members={team} />

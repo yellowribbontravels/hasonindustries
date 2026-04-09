@@ -24,7 +24,7 @@ export function ContactList({ initialData }: { initialData: any[] }) {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Permanently purge this transmission?")) return
+    if (!confirm("Permanently delete this enquiry?")) return
     const toastId = toast.loading("Purging...")
     try {
       const res = await fetch(`/api/admin/contact/${id}`, { method: "DELETE" })
@@ -40,13 +40,13 @@ export function ContactList({ initialData }: { initialData: any[] }) {
     <div className="flex flex-col gap-4">
       {list.length === 0 && (
         <div className="p-8 bg-[#FFFFFF] border border-neutral-200 text-center text-[#52525B] font-['DM_Mono'] text-sm">
-          No telemetry logs received.
+          No enquiries received.
         </div>
       )}
 
       {list.map(sub => (
         <div key={sub.id} className={`p-6 border flex flex-col gap-4 transition-colors duration-300 ${sub.read ? 'bg-[#FFFFFF] border-neutral-200 opacity-60 hover:opacity-100' : 'bg-[#FAFAFA] border-[#10B981] shadow-[0_0_15px_rgba(232,160,32,0.05)]'}`}>
-          
+
           <div className="flex justify-between items-start gap-4">
             <div>
               <h3 className={`text-xl font-['Bebas_Neue'] tracking-widest uppercase ${sub.read ? 'text-[#52525B]' : 'text-[#09090B]'}`}>{sub.subject}</h3>
@@ -54,20 +54,26 @@ export function ContactList({ initialData }: { initialData: any[] }) {
                 {sub.name} &bull; {sub.email} {sub.phone && `• ${sub.phone}`}
               </p>
             </div>
-            
+
             <div className="flex gap-4 shrink-0 mt-1">
-              <button 
+              <button
                 onClick={() => toggleRead(sub.id, sub.read)}
                 className="font-['DM_Mono'] text-[10px] tracking-widest uppercase hover:text-[#10B981] transition-colors"
                 style={{ color: sub.read ? '#52525B' : '#10B981' }}
               >
                 {sub.read ? "Mark Unread" : "Mark Read"}
               </button>
-              <button 
+              <a
+                href={`/admin/mailer?replyTo=${encodeURIComponent(sub.email)}&subject=${encodeURIComponent(`Re: ${sub.subject}`)}`}
+                className="font-['DM_Mono'] text-[10px] tracking-widest uppercase text-[#52525B] hover:text-[#09090B] transition-colors"
+              >
+                Reply
+              </a>
+              <button
                 onClick={() => handleDelete(sub.id)}
                 className="text-red-500/70 hover:text-red-400 font-['DM_Mono'] text-[10px] tracking-widest uppercase transition-colors"
               >
-                Purge
+                Delete
               </button>
             </div>
           </div>
@@ -77,8 +83,8 @@ export function ContactList({ initialData }: { initialData: any[] }) {
           </div>
 
           <div className="font-['DM_Mono'] text-[10px] text-[#52525B] uppercase tracking-widest flex items-center justify-between">
-            <span>Transmission Log: {new Date(sub.createdAt).toLocaleString()}</span>
-            <span>ID: {sub.id.substring(0,8)}</span>
+            <span>Enquiry Log: {new Date(sub.createdAt).toLocaleString()}</span>
+            <span>ID: {sub.id.substring(0, 8)}</span>
           </div>
         </div>
       ))}

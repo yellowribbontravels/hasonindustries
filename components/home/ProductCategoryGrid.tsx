@@ -13,7 +13,7 @@ export async function ProductCategoryGrid() {
   }
 
   return (
-    <section className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA]">
+    <section className="py-16 md:py-24 lg:py-32 bg-gradient-to-tl from-[#FAFAFA] via-[#10B981]/5 to-[#10B981]/15">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
         <div className="mb-10 md:mb-16">
@@ -32,7 +32,7 @@ export async function ProductCategoryGrid() {
             {categories.map((cat, index) => (
               <Link
                 key={cat.id}
-                href={`/products?category=${cat.slug}`}
+                href={`/products/${cat.slug}`}
                 className="group block bg-[#FFFFFF] border border-neutral-200 p-6 md:p-8 lg:p-10 hover:border-[#10B981] transition-all duration-300 relative overflow-hidden"
               >
                 {/* Hover fill */}

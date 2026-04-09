@@ -1,4 +1,5 @@
 import { ContactForm } from "@/components/contact/ContactForm"
+import { getSetting } from "@/lib/settings"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -6,7 +7,14 @@ export const metadata: Metadata = {
   description: "Initiate contact for bulk orders, specialized structural fabrications, and global supply chain requests."
 }
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const contactInfo = await getSetting("contact_info", {
+    phone1: "+1 (800) 555-0199",
+    phone2: "",
+    email: "info@hason.com",
+    address: "Hason Industrial Estate\nPhase 2, Sector 4\nIndustrial Zone"
+  })
+
   return (
     <div className="flex flex-col min-h-screen">
       <div className="pt-24 md:pt-32 lg:pt-40 pb-16 md:pb-24 lg:pb-32 px-4 sm:px-6 max-w-7xl mx-auto w-full relative z-10">
@@ -23,14 +31,16 @@ export default function ContactPage() {
             <div className="flex flex-col gap-6 md:gap-8 font-['DM_Mono'] text-xs sm:text-sm tracking-widest uppercase">
               <div className="border-l-2 border-[#10B981] pl-4">
                 <p className="text-[#10B981] text-[10px] mb-2 font-bold">Global Headquarters</p>
-                <p className="text-[#09090B]">Hason Industrial Estate</p>
-                <p className="text-[#09090B]">Phase 2, Sector 4</p>
+                {contactInfo.address.split("\n").map((line: string, i: number) => (
+                  <p key={i} className="text-[#09090B]">{line}</p>
+                ))}
               </div>
 
               <div className="border-l-2 border-neutral-200 pl-4 hover:border-[#10B981] transition-colors">
                 <p className="text-[#52525B] text-[10px] mb-2">Direct Lines</p>
-                <a href="tel:+18005550199" className="text-[#10B981] hover:text-[#09090B] transition-colors block">+1 (800) 555-0199</a>
-                <a href="mailto:info@hason.com" className="text-[#10B981] hover:text-[#09090B] transition-colors block mt-1">info@hason.com</a>
+                {contactInfo.phone1 && <a href={`tel:${contactInfo.phone1.replace(/[^0-9+]/g, '')}`} className="text-[#10B981] hover:text-[#09090B] transition-colors block">{contactInfo.phone1}</a>}
+                {contactInfo.phone2 && <a href={`tel:${contactInfo.phone2.replace(/[^0-9+]/g, '')}`} className="text-[#10B981] hover:text-[#09090B] transition-colors block mt-1">{contactInfo.phone2}</a>}
+                {contactInfo.email && <a href={`mailto:${contactInfo.email}`} className="text-[#10B981] hover:text-[#09090B] transition-colors block mt-1">{contactInfo.email}</a>}
               </div>
 
               <div className="border-l-2 border-neutral-200 pl-4 hover:border-[#10B981] transition-colors">

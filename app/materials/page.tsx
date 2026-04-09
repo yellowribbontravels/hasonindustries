@@ -2,7 +2,9 @@ import { prisma } from "@/lib/db"
 import Link from "next/link"
 import { Metadata } from "next"
 
-export const dynamic = "force-dynamic"
+export const dynamic = "force-static" // SSG route
+export const fetchCache = "force-cache"
+export const revalidate = 3600 // Regenerate every 1 hour
 
 export const metadata: Metadata = {
   title: "Industrial Materials | Hason Industries",
@@ -11,14 +13,16 @@ export const metadata: Metadata = {
 
 export default async function Materials() {
   const materials = await prisma.material.findMany({
+    include: { parentCat: true },
     orderBy: { createdAt: "desc" }
   })
 
   // Group by category
   const grouped: Record<string, typeof materials> = {}
   materials.forEach(m => {
-    if (!grouped[m.category]) grouped[m.category] = []
-    grouped[m.category].push(m)
+    const catName = m.parentCat?.name || "Uncategorized"
+    if (!grouped[catName]) grouped[catName] = []
+    grouped[catName].push(m)
   })
 
   return (
@@ -42,7 +46,7 @@ export default async function Materials() {
                 <h2 className="text-2xl md:text-3xl font-['Bebas_Neue'] text-[#10B981] mb-6 md:mb-8 border-b border-neutral-200 pb-3 md:pb-4">{category}</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                   {items.map(m => (
-                    <Link href={`/materials/${m.slug}`} key={m.id} className="group flex flex-col h-full bg-[#FFFFFF] border border-neutral-200 p-5 md:p-6 hover:border-[#10B981] transition-color transition-colors relative overflow-hidden">
+                    <Link href={`/materials/${m.parentCat?.slug || "uncategorized"}/${m.slug}`} key={m.id} className="group flex flex-col h-full bg-[#FFFFFF] border border-neutral-200 p-5 md:p-6 hover:border-[#10B981] transition-color transition-colors relative overflow-hidden">
                       <div className="absolute inset-0 bg-[#FAFAFA] -z-10 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-in-out"></div>
                       <h3 className="text-lg md:text-xl font-bold font-['DM_Mono'] text-[#09090B] uppercase tracking-wide mb-2 group-hover:text-[#10B981] transition-colors">{m.name}</h3>
                       <p className="text-xs text-[#52525B] line-clamp-3 mb-6 relative z-10">{m.description || "Specifications available for industrial deployment."}</p>

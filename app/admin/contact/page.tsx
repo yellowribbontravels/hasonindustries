@@ -12,9 +12,9 @@ export default async function ContactAdminPage() {
   return (
     <div>
       <h1 className="text-3xl font-['Bebas_Neue'] tracking-wider mb-8 border-b border-neutral-200 pb-4">
-        Incoming Telemetry Data
+        Incoming Enquiries
       </h1>
-      
+
       <ContactList initialData={submissions} />
     </div>
   )

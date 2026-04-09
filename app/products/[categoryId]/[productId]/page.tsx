@@ -5,14 +5,26 @@ import { CTA } from "@/components/home/CTA"
 import { JsonLd } from "@/components/seo/JsonLd"
 import type { Metadata } from "next"
 
-export const dynamic = "force-dynamic"
-export const fetchCache = "force-no-store"
+export const dynamic = "force-static" // Ensuring true SSG
+export const fetchCache = "force-cache"
+export const revalidate = 3600 // Revalidate every hour
 
-type Params = Promise<{ slug: string }>
+type Params = Promise<{ categoryId: string; productId: string }>
+
+export async function generateStaticParams() {
+  const products = await prisma.product.findMany({
+    select: { slug: true, categoryId: true, parentCat: { select: { slug: true } } }
+  })
+
+  return products.map((product) => ({
+    categoryId: product.parentCat?.slug || "uncategorized",
+    productId: product.slug,
+  }))
+}
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
-  const { slug } = await params
-  const product = await prisma.product.findUnique({ where: { slug }, include: { parentCat: true } })
+  const { productId } = await params
+  const product = await prisma.product.findUnique({ where: { slug: productId }, include: { parentCat: true } })
   if (!product) return {}
   return {
     title: `${product.name} | Component Specs | Hason Industries`,
@@ -21,9 +33,9 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 }
 
 export default async function ProductDetailPage({ params }: { params: Params }) {
-  const { slug } = await params
+  const { productId } = await params
   const product = await prisma.product.findUnique({
-    where: { slug },
+    where: { slug: productId },
     include: { parentCat: true }
   })
 
@@ -47,8 +59,8 @@ export default async function ProductDetailPage({ params }: { params: Params }) 
       <JsonLd data={productJsonLd} />
 
       <div className="pt-24 md:pt-32 pb-16 md:pb-24 px-4 sm:px-6 max-w-7xl mx-auto w-full">
-        <Link href="/products" className="text-[#52525B] font-['DM_Mono'] text-[10px] md:text-xs uppercase tracking-widest hover:text-[#10B981] transition-colors mb-6 md:mb-8 inline-block select-none">
-          ← Return to Matrix
+        <Link href={`/products/${product.parentCat?.slug || "uncategorized"}`} className="text-[#52525B] font-['DM_Mono'] text-[10px] md:text-xs uppercase tracking-widest hover:text-[#10B981] transition-colors mb-6 md:mb-8 inline-block select-none">
+          ← Return to {product.parentCat?.name || "Uncategorized"} Category
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 mt-4 md:mt-8">

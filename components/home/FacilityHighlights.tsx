@@ -30,8 +30,8 @@ export function FacilityHighlights() {
   }, [])
 
   return (
-    <section ref={container} className="py-16 md:py-24 lg:py-32 bg-[#FFFFFF] border-y border-neutral-200 relative overflow-hidden">
-      <div className="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#10B981] via-[#FAFAFA] to-[#FAFAFA] pointer-events-none" />
+    <section ref={container} className="py-16 md:py-24 lg:py-32 bg-gradient-to-b from-[#FFFFFF] via-[#10B981]/5 to-[#10B981]/20 border-y border-neutral-200 relative overflow-hidden">
+      <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#10B981] via-[#10B981]/10 to-transparent pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center relative z-10">
 

@@ -2,14 +2,41 @@ import { prisma } from "@/lib/db"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { JsonLd } from "@/components/seo/JsonLd"
+import type { Metadata } from "next"
 
-export const dynamic = "force-dynamic"
+export const dynamic = "force-static" // SSG route
+export const fetchCache = "force-cache"
+export const revalidate = 3600 // Regenerate every 1 hour
 
-export default async function MaterialDetail({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params
+type Params = Promise<{ categoryId: string; materialId: string }>
+
+export async function generateStaticParams() {
+  const materials = await prisma.material.findMany({
+    select: { slug: true, categoryId: true, parentCat: { select: { slug: true } } }
+  })
+
+  return materials.map((mat) => ({
+    categoryId: mat.parentCat?.slug || "uncategorized",
+    materialId: mat.slug,
+  }))
+}
+
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+  const { materialId } = await params
+  const material = await prisma.material.findUnique({ where: { slug: materialId } })
+  if (!material) return {}
+  return {
+    title: `${material.name} | Material Specs | Hason Industries`,
+    description: (material.description || "").substring(0, 160)
+  }
+}
+
+export default async function MaterialDetail({ params }: { params: Params }) {
+  const { materialId } = await params
 
   const material = await prisma.material.findUnique({
-    where: { slug }
+    where: { slug: materialId },
+    include: { parentCat: true }
   })
 
   if (!material) notFound()
@@ -35,6 +62,9 @@ export default async function MaterialDetail({ params }: { params: Promise<{ slu
           <div className="flex font-['DM_Mono'] text-[10px] md:text-xs tracking-widest uppercase gap-2 md:gap-4 opacity-80 flex-wrap">
             <Link href="/" className="hover:text-white">HOME</Link> /
             <Link href="/materials" className="hover:text-white">MATERIALS</Link> /
+            <Link href={`/materials/${material.parentCat?.slug || "uncategorized"}`} className="hover:text-white uppercase">
+              {material.parentCat?.name || "Uncategorized"}
+            </Link> /
             <span className="font-bold text-white max-w-[150px] md:max-w-none truncate" title={material.name}>{material.name}</span>
           </div>
         </div>

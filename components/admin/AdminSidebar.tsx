@@ -13,6 +13,7 @@ const navLinks = [
   { href: "/admin/certificates", label: "Compliance" },
   { href: "/admin/gallery", label: "Gallery Assets" },
   { href: "/admin/users", label: "User Accounts" },
+  { href: "/admin/mailer", label: "Mailer" },
   { href: "/admin/settings", label: "Global Settings" },
   { href: "/admin/contact", label: "Contact Submissions" }
 ]
@@ -32,14 +33,13 @@ export function AdminSidebar() {
           // Precise matching for parents vs children
           const isExact = pathname === link.href
           return (
-            <Link 
-              key={link.href} 
+            <Link
+              key={link.href}
               href={link.href}
-              className={`px-4 py-3 font-['DM_Mono'] text-sm tracking-wide transition-colors ${
-                isExact 
-                  ? "bg-[#10B981] text-[#FAFAFA] font-bold" 
+              className={`px-4 py-3 font-['DM_Mono'] text-sm tracking-wide transition-colors ${isExact
+                  ? "bg-[#10B981] text-[#FAFAFA] font-bold"
                   : "text-[#52525B] hover:bg-neutral-200 hover:text-[#09090B]"
-              } ${link.href.includes("categories") ? 'ml-4 border-l-2 border-neutral-300' : ''}`}
+                } ${link.href.includes("categories") ? 'ml-4 border-l-2 border-neutral-300' : ''}`}
             >
               {link.href.includes("categories") ? `↳ ${link.label}` : link.label}
             </Link>

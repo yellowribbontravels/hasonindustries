@@ -3,24 +3,17 @@ import Link from "next/link"
 import { CTA } from "@/components/home/CTA"
 import type { Metadata } from "next"
 
-export const dynamic = "force-dynamic"
-export const fetchCache = "force-no-store"
+export const dynamic = "force-static" // SSG route
+export const fetchCache = "force-cache"
+export const revalidate = 3600 // Regenerate every 1 hour
 
 export const metadata: Metadata = {
   title: "Products Matrix | Hason Industries",
   description: "Browse our advanced catalog of glass epoxy, engineering plastics, and CNC components."
 }
 
-export default async function ProductsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
-}) {
-  const resolvedParams = await searchParams
-  const categoryFilter = typeof resolvedParams.category === 'string' ? resolvedParams.category : undefined
-
+export default async function ProductsPage() {
   const products = await prisma.product.findMany({
-    where: categoryFilter ? { parentCat: { slug: categoryFilter } } : {},
     include: { parentCat: true },
     orderBy: { createdAt: 'desc' }
   })
@@ -57,11 +50,12 @@ export default async function ProductsPage({
           </h3>
           <nav className="flex flex-row md:flex-col gap-2 md:gap-3 font-['DM_Mono'] text-[10px] md:text-xs uppercase tracking-widest overflow-x-auto pb-4 md:pb-0 scrollbar-hide whitespace-nowrap md:whitespace-normal">
             {categories.map(c => {
-              const isActive = (categoryFilter || "") === c.id
+              const isActive = "" === c.id // Base page is active for "All Assets"
+              const href = c.id ? `/products/${c.id}` : "/products"
               return (
                 <Link
                   key={c.id || "all"}
-                  href={c.id ? `/products?category=${c.id}` : "/products"}
+                  href={href}
                   className={`transition-colors py-2 md:py-3 px-4 md:px-0 md:border-l-2 md:border-b-0 border-b-2 md:pl-4 inline-block md:block ${isActive ? 'text-[#10B981] border-[#10B981] bg-[#FFFFFF] shadow-sm md:shadow-none' : 'text-[#52525B] border-transparent hover:border-neutral-300 md:hover:text-[#09090B]'}`}
                 >
                   {c.label}
@@ -80,7 +74,7 @@ export default async function ProductsPage({
           ) : (
             products.map((product) => (
               <Link
-                href={`/products/${product.slug}`}
+                href={`/products/${product.parentCat?.slug || "uncategorized"}/${product.slug}`}
                 key={product.id}
                 className="group border border-neutral-200 bg-[#FFFFFF] flex flex-col hover:border-[#10B981] transition-colors relative"
               >
