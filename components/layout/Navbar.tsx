@@ -44,7 +44,7 @@ export async function Navbar() {
             <Link href="/materials" className="hover:text-white/80 transition-colors flex items-center gap-1 whitespace-nowrap">
               Materials
               <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
-                <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </Link>
 
@@ -54,12 +54,12 @@ export async function Navbar() {
                   <div key={cat.id}>
                     <h3 className="uppercase font-bold tracking-widest text-[#09090B] mb-3 border-b border-neutral-200 pb-2 flex justify-between items-end text-[11px]">
                       {cat.name}
-                      <Link href={`/materials/category/${cat.slug}`} className="text-[9px] text-[#10B981] opacity-70 hover:opacity-100 font-normal">VIEW ALL</Link>
+                      <Link href={`/materials/${cat.slug}`} className="text-[9px] text-[#10B981] opacity-70 hover:opacity-100 font-normal">VIEW ALL</Link>
                     </h3>
                     <ul className="space-y-2 text-[#52525B]">
                       {cat.materials.map(m => (
                         <li key={m.slug}>
-                          <Link href={`/materials/${m.slug}`} className="hover:text-[#0F9D58] transition-colors text-[11px]">{m.name}</Link>
+                          <Link href={`/materials/${cat.slug}/${m.slug}`} className="hover:text-[#0F9D58] transition-colors text-[11px]">{m.name}</Link>
                         </li>
                       ))}
                     </ul>

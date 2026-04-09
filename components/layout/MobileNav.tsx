@@ -145,21 +145,22 @@ export function MobileNav({ categories, contactPhone }: Props) {
                               </p>
                               <div className="flex flex-col gap-1">
                                 {cat.materials.map((m) => (
-                                  <Link
-                                    key={m.slug}
-                                    href={`/materials/${m.slug}`}
-                                    onClick={close}
-                                    className="font-['DM_Mono'] text-sm text-[#A1A1AA] hover:text-[#FAFAFA] transition-colors py-1"
-                                  >
-                                    {m.name}
-                                  </Link>
+                                  <li key={m.slug} className="list-none">
+                                    <Link
+                                      href={`/materials/${cat.slug}/${m.slug}`}
+                                      onClick={close}
+                                      className="block font-['DM_Mono'] text-sm text-[#A1A1AA] hover:text-[#10B981] transition-colors py-1"
+                                    >
+                                      {m.name}
+                                    </Link>
+                                  </li>
                                 ))}
                                 <Link
-                                  href={`/materials/category/${cat.slug}`}
+                                  href={`/materials/${cat.slug}`}
                                   onClick={close}
-                                  className="font-['DM_Mono'] text-[10px] text-[#10B981] uppercase tracking-widest mt-1"
+                                  className="pt-2 mt-2 block border-t border-neutral-800 font-['DM_Mono'] text-xs text-[#10B981] hover:text-[#FAFAFA] transition-colors uppercase tracking-widest"
                                 >
-                                  View all →
+                                  View All {cat.name}
                                 </Link>
                               </div>
                             </div>
